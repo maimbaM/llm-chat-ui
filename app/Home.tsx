@@ -67,7 +67,6 @@ export default function Home() {
             <main className="flex gap-6 max-w-7xl mx-auto">
                 {/* History Sidebar */}
                 <aside className="w-1/3 bg-white/70 backdrop-blur-xl rounded-2xl shadow-2xl p-6 border border-gray-200">
-                    {/* AI Influencer Profile */}
                     <div className="flex flex-col items-center text-center mb-8">
                         <div
                             className="w-20 h-20 bg-gradient-to-tr from-blue-400 via-cyan-400 to-teal-300 rounded-full flex items-center justify-center text-4xl shadow-lg">
