@@ -1,14 +1,35 @@
 "use client";
-
+import React from 'react';
+import Image from "next/image";
 import {useState, useEffect} from "react";
 import {Loader2, Send, History, Trash2} from "lucide-react";
 
+interface Place {
+    name: string;
+    location: string;
+    budget: string;
+    description: string;
+    best_time: string;
+    good_for: string;
+}
+
+interface ApiResponse {
+    answer: {
+        places: Place[];
+    };
+}
+
+interface HistoryItem {
+    question: string;
+    answer: ApiResponse;
+}
+
 export default function Home() {
     const [question, setQuestion] = useState("");
-    const [answer, setAnswer] = useState("");
+    const [answer, setAnswer] = useState<ApiResponse | null>(null);
     const [loading, setLoading] = useState(false);
-    const [history, setHistory] = useState([]);
-    const [selectedQnA, setSelectedQnA] = useState(null);
+    const [history, setHistory] = useState<HistoryItem[]>([]);
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/webhook';
 
     useEffect(() => {
         const stored = localStorage.getItem("query_history");
@@ -18,24 +39,39 @@ export default function Home() {
     const askQuestion = async () => {
         if (!question.trim()) return;
         setLoading(true);
-        setAnswer("");
+        setAnswer(null);
         try {
-            const res = await fetch("http://localhost:8000/ask", {
+            const res = await fetch(process.env.NEXT_PUBLIC_API_URL!, {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
                 body: JSON.stringify({question}),
             });
 
             const data = await res.json();
-            const newEntry = {question, answer: data.answer};
-            const updated = [newEntry, ...history];
 
-            setAnswer(data.answer);
-            setHistory(updated);
-            localStorage.setItem("query_history", JSON.stringify(updated));
-            setSelectedQnA(newEntry);
+            // Handle error response
+            if (data.error) {
+                console.error("Backend error:", data.error);
+                return;
+            }
+
+            // Handle successful response
+            if (data.answer && typeof data.answer === 'object' && Array.isArray(data.answer.places)) {
+                const responseData: ApiResponse = {
+                    answer: {
+                        places: data.answer.places
+                    }
+                };
+                const newEntry = {question, answer: responseData};
+                const updated = [newEntry, ...history];
+                setAnswer(responseData);
+                setHistory(updated);
+                localStorage.setItem("query_history", JSON.stringify(updated));
+            } else {
+                console.error("Invalid response format:", data);
+            }
         } catch (err: unknown) {
-            setAnswer("Oops! Nairobi’s vibes got interrupted. Try again 💔");
+            console.error("Error fetching response:", err);
         } finally {
             setLoading(false);
         }
@@ -44,11 +80,60 @@ export default function Home() {
     const clearHistory = () => {
         localStorage.removeItem("query_history");
         setHistory([]);
-        setSelectedQnA(null);
         setQuestion("");
-        setAnswer("");
+        setAnswer(null);
     };
 
+    const renderHistoryItem = (item: HistoryItem) => {
+        try {
+            if (!item.answer?.answer?.places) {
+                return "No results found";
+            }
+            return item.answer.answer.places
+                .map(place => place.name)
+                .join(", ") || "No places found";
+        } catch (err) {
+            console.error("Error rendering history item:", err);
+            return "No results found";
+        }
+    };
+
+    const renderAnswer = () => {
+        if (!answer?.answer?.places) return null;
+
+        return (
+            <div className="bg-white border-l-4 border-cyan-400 p-6 rounded-2xl shadow-lg animate-fade-in">
+                <h2 className="text-2xl font-bold text-blue-700 mb-3">
+                    💎 Gem Drop Incoming...
+                </h2>
+                <p className="text-gray-600 mb-4 italic">You asked: {question}</p>
+                <div className="grid gap-6">
+                    {answer.answer.places.map((place: Place, index: number) => (
+                        <div key={index} className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                            <div className="flex justify-between items-start mb-2">
+                                <h3 className="text-xl font-bold text-gray-800">{place.name}</h3>
+                                <span className="text-green-600 font-semibold">{place.budget}</span>
+                            </div>
+                            <div className="flex items-center text-gray-600 mb-3">
+                                <span className="text-sm">📍 {place.location}</span>
+                            </div>
+                            <p className="text-gray-700 mb-3">{place.description}</p>
+                            <div className="grid grid-cols-2 gap-4 text-sm">
+                                <div>
+                                    <span className="font-semibold text-blue-600">Best Time:</span>
+                                    <p className="text-gray-600">{place.best_time}</p>
+                                </div>
+                                <div>
+                                    <span className="font-semibold text-blue-600">Good For:</span>
+                                    <p className="text-gray-600">{place.good_for}</p>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        );
+    };
     return (
         <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white px-6 py-10 font-sans text-gray-800">
             {/* Header */}
@@ -57,10 +142,13 @@ export default function Home() {
                     🏴‍☠️ Nairobi Gems
                 </h1>
                 <p className="mt-2 text-lg text-gray-600 italic">
-                    Your AI influencer guide to Nairobi's best-kept secrets
+                    Your AI influencer guide to Nairobi&apos;s Hidden Gems
+                </p>
+                <p className="mt-2 text-lg text-gray-600 italic">
+                    Unadai nini, nikushow base ?
                 </p>
                 <p className="mt-2 text-4xl text-gray-600">
-                    🍕🥂🏌🏾‍♂️
+                    🍕🥂🏌🏾‍♂️💃🏼
                 </p>
             </header>
 
@@ -79,27 +167,28 @@ export default function Home() {
                         </p>
                         <div className="flex justify-around gap-4 mt-5 text-xs text-gray-600 font-medium w-full">
                             <div className="flex flex-col items-center">
-                <span className="text-neutral-800 text-sm font-bold flex items-center gap-1">
-                  <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/instagram.svg" alt="IG"
-                       className="w-4 h-4"/>
-                  12K
-                </span>
+                                <span className="text-neutral-800 text-sm font-bold flex items-center gap-1">
+                                    <Image
+                                        src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/instagram.svg"
+                                        alt="IG" width={16} height={16} className="w-4 h-4"/>
+                                    30K
+                                </span>
                                 <span>Instagram</span>
                             </div>
                             <div className="flex flex-col items-center">
-                <span className="text-neutral-800 text-sm font-bold flex items-center gap-1">
-                  <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/tiktok.svg" alt="TikTok"
-                       className="w-4 h-4"/>
-                  9.8K
-                </span>
+                                <span className="text-neutral-800 text-sm font-bold flex items-center gap-1">
+                                    <Image src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/tiktok.svg"
+                                           alt="TikTok" width={16} height={16} className="w-4 h-4"/>
+                                    50K
+                                </span>
                                 <span>TikTok</span>
                             </div>
                             <div className="flex flex-col items-center">
-                <span className="text-neutral-800 text-sm font-bold flex items-center gap-1">
-                  <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/x.svg" alt="X"
-                       className="w-4 h-4"/>
-                  6.3K
-                </span>
+                                <span className="text-neutral-800 text-sm font-bold flex items-center gap-1">
+                                    <Image src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/x.svg"
+                                           alt="X" width={16} height={16} className="w-4 h-4"/>
+                                    15.6K
+                                </span>
                                 <span>X</span>
                             </div>
                         </div>
@@ -130,7 +219,6 @@ export default function Home() {
                                 <li
                                     key={idx}
                                     onClick={() => {
-                                        setSelectedQnA(item);
                                         setQuestion(item.question);
                                         setAnswer(item.answer);
                                     }}
@@ -142,7 +230,7 @@ export default function Home() {
                                 >
                                     <p className="font-medium">{item.question}</p>
                                     <p className="text-sm text-gray-500 mt-1 line-clamp-2">
-                                        {item.answer}
+                                        {renderHistoryItem(item)}
                                     </p>
                                 </li>
                             ))
@@ -154,17 +242,17 @@ export default function Home() {
                 <section className="flex-1 flex flex-col">
                     {/* Question Form */}
                     <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl p-6 mb-6 border border-gray-100">
-            <textarea
-                value={question}
-                onChange={(e) => setQuestion(e.target.value)}
-                placeholder="✨ Ask about hidden restaurants, views, art spots..."
-                className="w-full p-4 border border-gray-300 rounded-lg mb-4 resize-none focus:outline-none focus:ring-2 focus:ring-blue-400 text-base"
-                rows={4}
-            />
+                        <textarea
+                            value={question}
+                            onChange={(e) => setQuestion(e.target.value)}
+                            placeholder="✨ Ask about hidden restaurants, vibes, views, music, spots..."
+                            className="w-full p-4 border border-gray-300 rounded-lg mb-4 resize-none focus:outline-none focus:ring-2 focus:ring-blue-400 text-base"
+                            rows={4}
+                        />
                         <button
                             onClick={askQuestion}
                             disabled={loading}
-                            className={`px-6 py-2 rounded-lg font-semibold flex items-center gap-2 transition-all ${
+                            className={`px-6 py-2 rounded-lg font-semi-bold flex items-center gap-2 transition-all ${
                                 loading
                                     ? "bg-blue-300 cursor-not-allowed"
                                     : "bg-blue-600 hover:bg-blue-700"
@@ -180,15 +268,8 @@ export default function Home() {
                     </div>
 
                     {/* Answer Section */}
-                    {answer && (
-                        <div className="bg-white border-l-4 border-cyan-400 p-6 rounded-2xl shadow-lg animate-fade-in">
-                            <h2 className="text-2xl font-bold text-blue-700 mb-3">
-                                💎 Gem Drop Incoming...
-                            </h2>
-                            <p className="text-gray-600 mb-2 italic">You asked: {question}</p>
-                            <p className="text-lg text-gray-800 leading-relaxed">{answer}</p>
-                        </div>
-                    )}
+                    {/* Answer Section */}
+                    {answer && renderAnswer()}
                 </section>
             </main>
         </div>
