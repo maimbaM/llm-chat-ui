@@ -29,7 +29,6 @@ export default function Home() {
     const [answer, setAnswer] = useState<ApiResponse | null>(null);
     const [loading, setLoading] = useState(false);
     const [history, setHistory] = useState<HistoryItem[]>([]);
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/webhook';
 
     useEffect(() => {
         const stored = localStorage.getItem("query_history");
