@@ -37,30 +37,6 @@ The whole application is deployed and can be found here  - https://main.d34he85m
 - Backend is already set up and running
   -The backend repo and instruction on how to install can be found here - https://github.com/maimbaM/nairobi-gems-backend.git
 
-
-### Options
-### Using Docker (recommended)
-Ensure Docker is installed
-
-1. Clone the repository:
-```bash
-# Clone the repository
-git clone https://github.com/maimbaM/llm-chat-ui.git
-cd llm-chat-ui
-```
-2. Set up environment variables:
-   - Create a `.env.local` file 
-   - Modify the `.env.local` file with your `NEXT_PUBLIC_WEBHOOK_URL` pointing to your backend's webhook endpoint.
-   - Example `.env.local` file:
-   ```plaintext
-   NEXT_PUBLIC_WEBHOOK_URL=http://localhost:8000/webhook
-   ```
-3. Build the project
-```bash
-docker-compose up --build
-```
-4. Access the API at `http://localhost:3000`.
-
 ### Local Development
 
 1. Clone the repository:
