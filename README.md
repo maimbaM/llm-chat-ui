@@ -88,7 +88,8 @@ npm run dev
 
 
 ## Deployment
-The application is deployed using AWS Amplify and its can set it up by connecting your GitHub repository to AWS Amplify.
+The application is deployed using AWS Amplify, and it is already set up by connecting the GitHub repository to AWS Amplify.
+
 On each commit to the main branch, the application will automatically build and deploy.
 
 ## Usage
