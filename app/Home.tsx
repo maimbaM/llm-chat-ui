@@ -141,7 +141,7 @@ export default function Home() {
                     🏴‍☠️ Nairobi Gems
                 </h1>
                 <p className="mt-2 text-lg text-gray-600 italic">
-                    Your AI influencer guide to Nairobi&apos;s Hidden Gems
+                    Your AI influencer to Nairobi&apos;s Hidden Gems
                 </p>
                 <p className="mt-2 text-lg text-gray-600 italic">
                     Unadai nini, nikushow base ?

@@ -1,7 +1,7 @@
 // app/page.tsx
 export const metadata = {
-  title: "AI Travel Tour Guide",
-  description: "Your smart destination assistant",
+  title: "🇰🇪Nairobi Gems",
+  description: "Your AI influencer to Nairobi&apos;s Hidden Gems",
 };
 
 import Home from "./Home";
