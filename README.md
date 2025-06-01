@@ -1,36 +1,119 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+### 🇰🇪Nairobi Gems Frontend 
+Your AI influencer to Nairobi's Hidden Gems
 
-## Getting Started
+An AI-powered web application that helps users discover hidden gems in Nairobi, including restaurants, entertainment spots, and local experiences.
 
-First, run the development server:
+This repo is just for the frontend. It is designed to be used with a backend application that receives requests on the `/webhook` endpoint. 
 
+The backend repo and instruction on how to install can be found here - https://github.com/maimbaM/nairobi-gems-backend.git
+
+The whole application is deployed and can be found here  - https://main.d34he85m4y34lf.amplifyapp.com/
+
+![Nairobi Gems Main Interface](./screenshots/1.png)
+
+
+## Features
+
+- 🤖 AI-powered recommendations for Nairobi's hidden spots
+- 💬 Interactive chat interface
+- 📍 Detailed location information including budget, best times, and recommendations
+- 🗂 Query history management - using Local Storage
+- 💫 Modern, responsive UI 
+
+## Tech Stack
+
+- Next.js (React framework)
+- TypeScript
+- Tailwind CSS
+- AWS Amplify for deployment
+
+
+## Setup Instructions
+
+### Prerequisites
+- Node.js (v18 or later)
+- npm (Node Package Manager)
+- Docker (optional)
+- Backend is already set up and running
+  -The backend repo and instruction on how to install can be found here - https://github.com/maimbaM/nairobi-gems-backend.git
+
+
+### Options
+### Using Docker (recommended)
+Ensure Docker is installed
+
+1. Clone the repository:
+```bash
+# Clone the repository
+git clone https://github.com/maimbaM/llm-chat-ui.git
+cd llm-chat-ui
+```
+2. Set up environment variables:
+   - Create a `.env.local` file 
+   - Modify the `.env.local` file with your `NEXT_PUBLIC_WEBHOOK_URL` pointing to your backend's webhook endpoint.
+   - Example `.env.local` file:
+   ```plaintext
+   NEXT_PUBLIC_WEBHOOK_URL=http://localhost:8000/webhook
+   ```
+3. Build the project
+```bash
+docker-compose up --build
+```
+4. Access the API at `http://localhost:3000`.
+
+### Local Development
+
+1. Clone the repository:
+```bash
+# Clone the repository
+git clone https://github.com/maimbaM/llm-chat-ui.git
+cd llm-chat-ui
+```
+2. Set up environment variables:
+   - Create a `.env.local` file 
+   - Modify the `.env.local` file with your `NEXT_PUBLIC_WEBHOOK_URL` pointing to your backend's webhook endpoint.
+   - Example `.env.local` file:
+   ```plaintext
+   NEXT_PUBLIC_WEBHOOK_URL=http://localhost:8000/webhook
+   ```
+3. Install dependencies:
+```bash
+npm install
+```
+4. Start the development server:
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
+5. Access the application at `http://localhost:3000`.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Deployment
+The application is deployed using AWS Amplify and its can set it up by connecting your GitHub repository to AWS Amplify.
+On each commit to the main branch, the application will automatically build and deploy.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Usage
+Accepts questions and returns AI-generated recommendations. 
 
-## Learn More
+Keeps a history of previous asked questions
 
-To learn more about Next.js, take a look at the following resources:
+Question examples
+1. Pizza places
+2. Karaoke in Westlands
+3. Sunday brunch spots
+4. nature walks
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Responses
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Returns a list of 3 places to visit in Nairobi based on the question asked. Each place includes:
+- `name`: Name of the place
+- `location`: General area or neighborhood
+- `budget`: Estimated budget (e.g., $, $$, $$$)
+- `description`: A brief description of the place
+- `best_time`: Best time to visit
+- `good_for`: Who the place is suitable for (e.g., solo, couples, families, groups)
 
-## Deploy on Vercel
+![Nairobi Gems](./screenshots/2.png)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Improvements
+1. Add authentication
